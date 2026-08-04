@@ -1,0 +1,65 @@
+import { BadRequestError, NotFoundError } from "../errors/index.js";
+import Job from "../models/Job.js"
+import StatusCodes from "http-status-codes"
+
+export const getAllJobs = async (req, res) => {
+
+    const jobs = await Job.find({ createdBy: req.user.userId }).sort("createdAt");
+
+    res.status(StatusCodes.OK).json({ success: true, data: jobs })
+}
+
+export const getJob = async (req, res) => {
+    const { user: { userId }, params: { id: jobId } } = req;
+
+    const job = await Job.find({ _id: jobId, createdBy: userId });
+
+    if (!job) {
+        throw new NotFoundError(`No Jobs exist with this id ${jobId}`);
+
+    }
+    res.status(StatusCodes.OK).json(job);
+}
+
+
+export const createJob = async (req, res) => {
+    req.body.createdBy = req.user.userId;
+
+    const job = await Job.create({ ...req.body });
+
+    res.status(StatusCodes.CREATED).json(job);
+}
+
+
+export const updateJob = async (req, res) => {
+    const { body: { company, position }, user: { userId }, params: { id: jobId } } = req;
+
+    if (company === "" || position === "") {
+        throw new BadRequestError("Company and position cannont be empty")
+    }
+
+
+    const job = await Job.findOneAndUpdate({ _id: jobId, createdBy: userId }, req.body, { returnDocument: "after", runValidators: true });
+
+
+    if (!job) {
+        throw new NotFoundError(`No Jobs exist with this id ${jobId}`);
+
+
+    }
+    res.status(StatusCodes.OK).json({ msg: `Job updated succesfully`, job });
+}
+
+
+export const deleteJob = async (req, res) => {
+    const { user: { userId }, params: { id: jobId } } = req;
+
+
+    const job = await Job.findOneAndDelete({ _id: jobId, createdBy: userId })
+    if (!job) {
+        throw new NotFoundError("Job doesn't exist");
+
+    }
+    res.status(StatusCodes.OK).json(`Job deleted succesfully`);
+
+}

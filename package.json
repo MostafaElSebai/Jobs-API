@@ -1,0 +1,26 @@
+{
+  "name": "06-jobs-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node --env-file .env --watch app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.1",
+    "helmet": "^8.3.0",
+    "http-status-codes": "^2.3.0",
+    "joi": "^18.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.9.1",
+    "swagger-ui-express": "^5.0.1",
+    "xss-clean": "^0.1.4",
+    "yamljs": "^0.3.0"
+  }
+}
