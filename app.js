@@ -28,22 +28,32 @@ app.use(xss())
 // routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/jobs', auth, jobsRouter);
+app.get('/', (req, res) => {
+  res.send("Welcome home")
+})
 
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
-const port = process.env.PORT || 3000;
+
+// const port = process.env.PORT || 3000;
 
 const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI)
-    app.listen(port, () =>
-      console.log(`Server is listening on port ${port}...`)
-    );
+    console.log("Database connection is successful");
+    //  app.listen(port, () =>
+    //   console.log(`Server is listening on port ${port}...`)
+    // );
+
   } catch (error) {
     console.log(error);
   }
 };
 
-start();
+// start()
+
+// export to hand to vercel 
+export default app
+
