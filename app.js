@@ -7,7 +7,6 @@ import connectDB from "./db/connect.js";
 import auth from "./middleware/authentication.js";
 import helmet from "helmet";
 import cors from "cors";
-import xss from "xss-clean";
 import rateLimit from "express-rate-limit";
 
 
@@ -23,7 +22,6 @@ app.use(rateLimit({
 }))
 app.use(helmet())
 app.use(cors())
-app.use(xss())
 
 // routes
 app.use('/api/v1/auth', authRouter);
