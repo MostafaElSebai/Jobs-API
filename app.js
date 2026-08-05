@@ -3,7 +3,7 @@ import notFoundMiddleware from "./middleware/not-found.js";
 import errorHandlerMiddleware from "./middleware/error-handler.js";
 import authRouter from "./routes/auth.js";
 import jobsRouter from "./routes/jobs.js";
-import connectDB from "../starter/db/connect.js";
+import connectDB from "./db/connect.js";
 import auth from "./middleware/authentication.js";
 import helmet from "helmet";
 import cors from "cors";
