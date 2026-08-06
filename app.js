@@ -50,7 +50,7 @@ const start = async () => {
   }
 };
 
-// start()
+start()
 
 // export to hand to vercel 
 export default app
