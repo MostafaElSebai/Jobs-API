@@ -1,69 +1,86 @@
-#### Setup
+# Jobs API
+
+A REST API for tracking job applications, built as a Node.js/Express learning project. Registered users can manage their own jobs and track each application's status.
+
+## Tech stack
+
+- Node.js and Express 5
+- MongoDB and Mongoose
+- JWT authentication and bcryptjs password hashing
+- Helmet, CORS, and express-rate-limit
+- Centralized error-handling middleware
+
+## Features
+
+- User registration and login
+- Protected endpoints using Bearer tokens
+- Create, list, retrieve, update, and delete job applications
+- Each job is scoped to the authenticated user
+- Job statuses: `pending`, `interview`, and `declined`
+- Mongoose schema validation and timestamps
+
+## Getting started
+
+Requires Node.js with support for `--env-file`, npm, and a MongoDB database.
 
 ```bash
-npm install && npm start
+git clone https://github.com/MostafaElSebai/Jobs-API.git
+cd Jobs-API
+npm install
 ```
 
-#### Database Connection
+Create a `.env` file in the project root:
 
-1. Import connect.js
-2. Invoke in start()
-3. Setup .env in the root
-4. Add MONGO_URI with correct value
-
-#### Routers
-
-- auth.js
-- jobs.js
-
-#### User Model
-
-Email Validation Regex
-
-```regex
-/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+```env
+MONGO_URI=mongodb://127.0.0.1:27017/jobs-api
+JWT_SECRET=replace-with-a-long-random-secret
+JWT_LIFETIME=1d
+PORT=3000
 ```
 
-#### Register User
+**Local startup limitation:** The current `app.js` exports the Express application for Vercel, but its `app.listen()` call is commented out. As a result, `npm start` loads the app and connects to MongoDB but does **not** start a local HTTP server. To run locally, enable a listener after the database connection succeeds or add a separate local entry point. The repository includes `vercel.json` for serverless routing.
 
-- Validate - name, email, password - with Mongoose
-- Hash Password (with bcryptjs)
-- Save User
-- Generate Token
-- Send Response with Token
+## API endpoints
 
-#### Login User
+All routes start with `/api/v1`.
 
-- Validate - email, password - in controller
-- If email or password is missing, throw BadRequestError
-- Find User
-- Compare Passwords
-- If no user or password does not match, throw UnauthenticatedError
-- If correct, generate Token
-- Send Response with Token
+| Method | Endpoint | Access | Description |
+| --- | --- | --- | --- |
+| POST | `/auth/register` | Public | Register a user |
+| POST | `/auth/login` | Public | Authenticate and receive a JWT |
+| GET | `/jobs` | Bearer token | List your jobs |
+| POST | `/jobs` | Bearer token | Create a job |
+| GET | `/jobs/:id` | Bearer token | Retrieve one of your jobs |
+| PATCH | `/jobs/:id` | Bearer token | Update one of your jobs |
+| DELETE | `/jobs/:id` | Bearer token | Delete one of your jobs |
 
-#### Mongoose Errors
+### Authentication
 
-- Validation Errors
-- Duplicate (Email)
-- Cast Error
+Register with `name`, `email`, and `password`:
 
-#### Security
+```http
+POST /api/v1/auth/register
+Content-Type: application/json
 
-- helmet
-- cors
-- xss-clean
-- express-rate-limit
-
-Swagger UI
-
-```yaml
-/jobs/{id}:
-  parameters:
-    - in: path
-      name: id
-      schema:
-        type: string
-      required: true
-      description: the job id
+{"name":"Example User","email":"user@example.com","password":"example-password"}
 ```
+
+Login uses `email` and `password`. Both authentication endpoints return a `token` field formatted as `Bearer <jwt>`. Include that value in the `Authorization` header for all job endpoints.
+
+### Job example
+
+```http
+POST /api/v1/jobs
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{"company":"Example Co","position":"Backend Developer","status":"pending"}
+```
+
+`company` and `position` are required. `status` defaults to `pending` and can also be `interview` or `declined`.
+
+The `GET /jobs/:id` endpoint returns a single job. A job that does not exist or is not owned by the authenticated user results in a 404 response.
+
+## Project notes
+
+This is a course-based backend project intended to demonstrate Express routing, JWT authentication, MongoDB modeling, and user-scoped CRUD. It is not presented as a production-ready service. Automated tests and a complete OpenAPI specification are not included. The local server startup path is an outstanding improvement.
